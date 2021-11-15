@@ -29,8 +29,9 @@ roomsRouter.post("/", (req, res) => {
   }
 });
 
-roomsRouter.post("/", (req, res) => {
-  const { username, roomId } = req.body;
+roomsRouter.post("/:id", (req, res) => {
+  const roomId = req.params.id;
+  const { username } = req.body;
   if (username) {
     const newPlayer = usersController.create(username); // Register the user
     const roomToJoin = roomsController.get(roomId);
