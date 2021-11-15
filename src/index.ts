@@ -1,10 +1,10 @@
 import express from "express";
 import { createServer } from "http";
 import cors from "cors";
+import consola from "consola";
 import config from "./config/config";
 import routes from "./router";
 import socket from "./socket";
-import consola from "consola";
 
 const app = express();
 const httpServer = createServer(app);
