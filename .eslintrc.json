@@ -17,5 +17,5 @@
     "project": "./tsconfig.json"
   },
   "plugins": ["@typescript-eslint"],
-  "rules": { "no-console": "off", "import/extensions": "never" }
+  "rules": { "no-console": "off", "import/extensions": "off" }
 }
