@@ -21,6 +21,11 @@ const usersController = {
   delete: (id: string) => {
     const userIndex = users.findIndex((user) => user.id === id);
     users.splice(userIndex, 1);
+    return users;
+  },
+  deleteAll: () => {
+    users.splice(0, users.length);
+    return users;
   },
 };
 
