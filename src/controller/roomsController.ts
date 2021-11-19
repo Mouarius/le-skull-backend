@@ -27,6 +27,11 @@ const roomsController = {
   delete(id: string) {
     const roomIndex = rooms.findIndex((r) => r.id === id);
     rooms.splice(roomIndex, 1);
+    return rooms;
+  },
+  deleteAll() {
+    rooms.splice(0, rooms.length);
+    return rooms;
   },
 };
 
