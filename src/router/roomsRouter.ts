@@ -15,7 +15,7 @@ roomsRouter.get("/:id", (req, res) => {
 roomsRouter.get("/", (req, res) => {
   const rooms = roomsController.getAll();
 
-  res.status(200).json(rooms);
+  return res.status(200).json(rooms);
 });
 
 roomsRouter.post("/:id", (req, res) => {
@@ -26,12 +26,11 @@ roomsRouter.post("/:id", (req, res) => {
     const roomToJoin = roomsController.get(roomId);
     if (roomToJoin) {
       const updatedRoom = roomsController.add(roomToJoin.id, newPlayer);
-      res.status(201).json({ user: newPlayer, room: updatedRoom });
+      return res.status(201).json({ user: newPlayer, room: updatedRoom });
     }
-    res.status(404).json({ error: "Invalid or missing room id." });
-  } else {
-    res.status(400).json({ error: "Invalid or missing player" });
+    return res.status(404).json({ error: "Invalid or missing room id." });
   }
+  return res.status(400).json({ error: "Invalid or missing player" });
 });
 
 roomsRouter.post("/", (req, res) => {

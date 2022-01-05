@@ -9,6 +9,9 @@ const playersController = {
   getOne: (id: string) => {
     return players.find((player) => player.id === id);
   },
+  getBySocketId: (socketId: string) => {
+    return players.find((player) => player.socketId === socketId);
+  },
   create: (username: string) => {
     const id = uuidv4();
     const newPlayer: Player = {
