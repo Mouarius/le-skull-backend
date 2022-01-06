@@ -1,10 +1,14 @@
+type Color = "" | "red" | "green" | "blue";
 export interface Player {
   id: string;
   username: string;
-  color?: "" | "red" | "orange" | "yellow";
+  color?: Color;
   socketId?: string;
 }
 export interface Room {
   id: string;
+  colors?: {
+    taken: Color[];
+  };
   players: Player[];
 }
