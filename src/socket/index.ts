@@ -8,20 +8,23 @@ const socket = (httpServer: any) => {
     cors: { origin: "*", methods: ["GET", "POST"] },
   });
   io.on("connection", (socket) => {
-    console.log("A user has connected.");
+    consola.info("A user has connected.");
 
-    socket.on("hello", () => {
-      console.log('The user said "Hello"');
-    });
-
-    socket.on("JOIN_ROOM", (roomId, callback) => {
-      consola.info(`A player wants to join the game ${roomId}`);
-      socket.join(roomId);
-      const room = roomsController.get(roomId);
-      const player = playersController.getBySocketId(socket.id);
-      console.log(player);
-      socket.to(roomId).emit("PLAYER_JOINED", { room });
-      callback({ status: "ok" });
+    socket.on("JOIN_ROOM", (playerId, roomId, callback) => {
+      const player = playersController.getOne(playerId);
+      if (player) {
+        player.socketId = socket.id;
+        consola.info(
+          `The player ${player?.username} wants to join the game ${roomId}`
+        );
+        socket.join(roomId);
+        const room = roomsController.get(roomId);
+        io.to(roomId).emit("PLAYER_JOINED", player, room);
+        callback({ status: "ok" });
+      }
+      callback({
+        status: "error - No player with such id.",
+      });
     });
 
     socket.on("disconnect", () => {
