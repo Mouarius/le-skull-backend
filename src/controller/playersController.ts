@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import consola from "consola";
 import players from "../database/players";
 import { Player } from "../config/types";
 
@@ -19,6 +20,10 @@ const playersController = {
       id,
     };
     players.push(newPlayer);
+    consola.success(
+      `[players] ~ A new player with username ${newPlayer.username} has been registered.`
+    );
+    // TODO : Link a socket id to the player object
     return newPlayer;
   },
   delete: (id: string) => {

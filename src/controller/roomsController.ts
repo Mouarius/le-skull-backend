@@ -1,4 +1,5 @@
 import { customAlphabet } from "nanoid";
+import consola from "consola";
 import { Player, Room } from "../config/types";
 import rooms from "../database/rooms";
 
@@ -17,11 +18,17 @@ const roomsController = {
       players: [creator],
     };
     rooms.push(newRoom);
+    consola.success(
+      `[rooms] ~ A new room with id ${newRoom.id} has been created by ${creator.username}`
+    );
     return newRoom;
   },
   add(roomId: string, player: Player) {
     const room = rooms.find((r) => r.id === roomId);
     room?.players.push(player);
+    consola.success(
+      `[rooms] ~ The player ${player.username} has joined the game ${roomId}`
+    );
     return room;
   },
   delete(id: string) {
