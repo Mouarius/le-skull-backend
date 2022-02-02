@@ -4,6 +4,7 @@ export interface Player {
   username: string;
   color?: Color;
   socketId?: string;
+  roomId?: string;
 }
 export interface Room {
   id: string;

@@ -2,6 +2,7 @@ import { customAlphabet } from "nanoid";
 import consola from "consola";
 import { Player, Room } from "../config/types";
 import rooms from "../database/rooms";
+import playersController from "./playersController";
 
 const nanoid = customAlphabet("1234567890abcdef", 8);
 
@@ -25,10 +26,21 @@ const roomsController = {
   },
   addPlayer(roomId: string, player: Player) {
     const room = rooms.find((r) => r.id === roomId);
-    room?.players.push(player);
-    consola.success(
-      `[rooms] ~ The player ${player.username} has joined the game ${roomId}`
-    );
+    const playerToAdd = playersController.getOne(player.id);
+    if (room && playerToAdd) {
+      playerToAdd.roomId = room?.id;
+      room?.players.push(playerToAdd);
+      consola.success(
+        `[rooms] ~ The player ${player.username} has joined the game ${roomId}`
+      );
+    }
+    return room;
+  },
+  removePlayer(roomId: string, playerId: string) {
+    const room = rooms.find((r) => r.id === roomId);
+    if (room) {
+      room.players = room.players.filter((p) => p.id === playerId);
+    }
     return room;
   },
   delete(id: string) {

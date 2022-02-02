@@ -7,28 +7,40 @@ const socket = (httpServer: any) => {
   const io = new Server(httpServer, {
     cors: { origin: "*", methods: ["GET", "POST"] },
   });
-  io.on("connection", (socket) => {
+  io.on("connection", (client) => {
     consola.info("A user has connected.");
 
-    socket.on("JOIN_ROOM", (playerId, roomId, callback) => {
+    client.on("JOIN_ROOM", (playerId, roomId, callback) => {
       const player = playersController.getOne(playerId);
       if (player) {
-        player.socketId = socket.id;
         consola.info(
-          `The player ${player?.username} wants to join the game ${roomId}`
+          `The player ${player?.username} is connecting to the game ${roomId}`
         );
-        socket.join(roomId);
+        player.socketId = client.id;
+        client.join(roomId);
         const room = roomsController.get(roomId);
-        io.to(roomId).emit("PLAYER_JOINED", player, room);
-        callback({ status: "ok" });
+        if (room) {
+          io.to(roomId).emit("PLAYER_JOINED", player, room);
+          callback({ status: "ok" });
+        }
       }
       callback({
         status: "error - No player with such id.",
       });
     });
 
-    socket.on("disconnect", () => {
-      console.log("A user has disconnected.");
+    client.on("disconnect", () => {
+      consola.info(`The user with socket id : ${client.id}, has disconnected.`);
+      // TODO : Send a player disconnect event to the game
+      const player = playersController.getBySocketId(client.id);
+      if (player?.roomId) {
+        // That means, if the player is found in a game
+        const room = roomsController.get(player.roomId);
+        if (room) {
+          const updatedRoom = roomsController.removePlayer(room.id, player.id);
+          client.to(room.id).emit("PLAYER_LEFT", player, updatedRoom);
+        }
+      }
     });
   });
   return io;
