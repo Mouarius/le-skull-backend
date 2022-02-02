@@ -25,7 +25,7 @@ roomsRouter.post("/:id", (req, res) => {
     const newPlayer = playersController.create(username); // Register the user
     const roomToJoin = roomsController.get(roomId);
     if (roomToJoin) {
-      const updatedRoom = roomsController.add(roomToJoin.id, newPlayer);
+      const updatedRoom = roomsController.addPlayer(roomToJoin.id, newPlayer);
       return res.status(201).json({ user: newPlayer, room: updatedRoom });
     }
     return res.status(404).json({ error: "Invalid or missing room id." });

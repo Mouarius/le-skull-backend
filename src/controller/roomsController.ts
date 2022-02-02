@@ -23,7 +23,7 @@ const roomsController = {
     );
     return newRoom;
   },
-  add(roomId: string, player: Player) {
+  addPlayer(roomId: string, player: Player) {
     const room = rooms.find((r) => r.id === roomId);
     room?.players.push(player);
     consola.success(
