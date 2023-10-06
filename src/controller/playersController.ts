@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import players from "../database/players";
-import { Player } from "../config/types";
+import players from "../store/players";
+import { Player } from "../types";
 
 const playersController = {
   getAll: () => {
@@ -12,10 +12,10 @@ const playersController = {
   getBySocketId: (socketId: string) => {
     return players.find((player) => player.socketId === socketId);
   },
-  create: (username: string) => {
+  create: (username?: string) => {
     const id = uuidv4();
     const newPlayer: Player = {
-      username,
+      username: username,
       id,
     };
     players.push(newPlayer);

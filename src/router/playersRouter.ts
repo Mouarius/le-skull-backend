@@ -1,7 +1,7 @@
 import { Router } from "express";
 import consola from "consola";
 import playersController from "../controller/playersController";
-import players from "../database/players";
+import players from "../store/players";
 
 const playersRouter = Router();
 

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import playersController from "../controller/playersController";
-import roomsController from "../controller/roomsController";
+import { roomsController } from "../controller/roomsController";
 
 const roomsRouter = Router();
 
@@ -25,7 +25,7 @@ roomsRouter.post("/:id", (req, res) => {
     const newPlayer = playersController.create(username); // Register the user
     const roomToJoin = roomsController.get(roomId);
     if (roomToJoin) {
-      const updatedRoom = roomsController.add(roomToJoin.id, newPlayer);
+      const updatedRoom = roomsController.addPlayer(roomToJoin.id, newPlayer);
       return res.status(201).json({ user: newPlayer, room: updatedRoom });
     }
     return res.status(404).json({ error: "Invalid or missing room id." });
@@ -37,7 +37,7 @@ roomsRouter.post("/", (req, res) => {
   const { username } = req.body;
   if (username) {
     const creator = playersController.create(username); // Register the user
-    const newRoom = roomsController.create(creator); // Create a new room
+    const newRoom = roomsController.create(); // Create a new room
     return res.status(201).json({ user: creator, room: newRoom });
   }
   return res.status(400).json({ error: "Invalid or missing creator." });

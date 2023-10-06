@@ -1,4 +1,4 @@
-import { Room } from "../config/types";
+import { Room } from "../types";
 
 const rooms: Room[] = [];
 

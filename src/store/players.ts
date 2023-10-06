@@ -1,4 +1,4 @@
-import { Player } from "../config/types";
+import { Player } from "../types";
 
 const players: Player[] = [];
 
