@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import consola from "consola";
-import playersController from "./controller/playersController";
+import { playersController } from "./controller/playersController";
 import { roomsController } from "./controller/roomsController";
 import { sessionStore } from "./store/sessions";
 import type { RequestHandler } from "express";
@@ -11,6 +11,7 @@ import {
   SocketData,
 } from "./types/socket";
 import { randomId } from "./utils";
+import { Player, User } from "./types";
 
 export const useSocket = (
   httpServer: import("http").Server,
@@ -24,43 +25,53 @@ export const useSocket = (
   >(httpServer, {
     cors: { origin: "*", methods: ["GET", "POST"] },
   });
-  io.engine.use(sessionMiddleware);
-  io.use((socket, next) => {
-    const username = socket.handshake.auth.username;
-    if (!username) return next(new Error("Invalid username"));
 
+  io.engine.use(sessionMiddleware);
+
+  io.use((socket, next) => {
     const sessionId = socket.handshake.auth.sessionId;
     if (sessionId) {
+      consola.info(`User connecting with sessionId : ${sessionId}`)
       const session = sessionStore.findSession(sessionId);
       if (session) {
         socket.sessionId = sessionId;
         socket.userId = session.userId;
-        socket.username = username;
+        socket.username = session.username;
         return next();
       }
     }
-    const player = playersController.create(username);
+    const player = playersController.create();
     socket.userId = player.id;
     socket.sessionId = randomId();
-    socket.username = username;
+    consola.info(`Created a new player with id ${player.id}`);
     return next();
   });
+
   io.on("connection", (socket) => {
     sessionStore.saveSession(socket.sessionId, {
       userId: socket.userId,
       username: socket.username,
     });
-    console.log("sessionId:", socket.sessionId);
-    console.log("userId:", socket.userId);
 
-    if (!socket.userId) throw new Error("Invalid or missing userId");
+    const session = sessionStore.findSession(socket.sessionId)
 
-    const player =
-      playersController.getOne(socket.userId) ??
-      playersController.create("testPlayer");
+    const player = playersController.getOne(socket.userId);
 
-    socket.emit("SESSION", { sessionId: socket.sessionId });
-    console.log("player:", player);
+    if (!player) throw new Error("No player found for this id");
+
+    socket.emit("SESSION", {
+      sessionId: socket.sessionId,
+      username: socket.username,
+    });
+
+    socket.on("UPDATE_USER", (playerToUpdate: Player, callback:any) => {
+      consola.info("Updating the player ", player)
+      const newPlayer = playersController.update(player.id, playerToUpdate)
+      sessionStore.saveSession(socket.sessionId, {userId: newPlayer.id, username:newPlayer.username})
+      consola.info("Updated the player ", newPlayer)
+      callback({status:"SUCCESS", data:{player: {...newPlayer}}})
+
+    })
 
     socket.on("JOIN_ROOM", (roomId, callback) => {
       let room = roomsController.get(roomId);

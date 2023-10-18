@@ -2,17 +2,17 @@ import { v4 as uuidv4 } from "uuid";
 import players from "../store/players";
 import { Player } from "../types";
 
-const playersController = {
-  getAll: () => {
+class PlayersController {
+  getAll() {
     return players;
-  },
-  getOne: (id: string) => {
+  }
+  getOne(id: string) {
     return players.find((player) => player.id === id);
-  },
-  getBySocketId: (socketId: string) => {
+  }
+  getBySocketId(socketId: string) {
     return players.find((player) => player.socketId === socketId);
-  },
-  create: (username?: string) => {
+  }
+  create(username?: string) {
     const id = uuidv4();
     const newPlayer: Player = {
       username: username,
@@ -20,16 +20,23 @@ const playersController = {
     };
     players.push(newPlayer);
     return newPlayer;
-  },
-  delete: (id: string) => {
+  }
+  update(id:string, newPlayer: Player) {
+    const player = this.getOne(id)
+    if (!player) throw new Error("Player not found")
+    player.username = newPlayer.username
+    return player
+  }
+  delete(id: string) {
     const playerIndex = players.findIndex((player) => player.id === id);
     players.splice(playerIndex, 1);
     return players;
-  },
-  deleteAll: () => {
+  }
+  deleteAll() {
     players.splice(0, players.length);
     return players;
-  },
-};
+  }
+}
 
-export default playersController;
+export const playersController = new PlayersController()
+

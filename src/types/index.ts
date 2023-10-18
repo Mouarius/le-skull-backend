@@ -1,8 +1,11 @@
-export type Player = {
+export type User = {
   id: string;
   username?: string;
-  color?: "" | "red" | "orange" | "yellow";
   socketId?: string;
+}
+
+export type Player = User & {
+  color?: "" | "red" | "orange" | "yellow";
 };
 
 export type Room = {

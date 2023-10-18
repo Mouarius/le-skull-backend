@@ -1,6 +1,6 @@
 export type SessionData = {
   userId: string;
-  username: string;
+  username?: string;
 };
 
 class SessionStore {
