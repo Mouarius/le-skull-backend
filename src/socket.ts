@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import consola from "consola";
 import { playersController } from "./controller/playersController";
-import { roomsController } from "./controller/roomsController";
+import { gamesController as gamesController } from "./controller/gamesController";
 import { sessionStore } from "./store/sessions";
 import type { RequestHandler } from "express";
 import {
@@ -11,7 +11,7 @@ import {
   SocketData,
 } from "./types/socket";
 import { randomId } from "./utils";
-import { Player, User } from "./types";
+import { Player } from "./types";
 
 export const useSocket = (
   httpServer: import("http").Server,
@@ -37,13 +37,15 @@ export const useSocket = (
         socket.sessionId = sessionId;
         socket.userId = session.userId;
         socket.username = session.username;
+        consola.success("Successfully found the corresponding user for the session")
         return next();
       }
     }
+    consola.info("User connecting without session, creating a new session and player")
     const player = playersController.create();
     socket.userId = player.id;
     socket.sessionId = randomId();
-    consola.info(`Created a new player with id ${player.id}`);
+    consola.success(`Created a new player with id ${player.id}, and session with id ${socket.sessionId}`);
     return next();
   });
 
@@ -73,22 +75,22 @@ export const useSocket = (
 
     })
 
-    socket.on("JOIN_ROOM", (roomId, callback) => {
-      let room = roomsController.get(roomId);
-      if (!room) return;
-      room = roomsController.addPlayer(room?.id, player);
-      if (!room) return;
+    socket.on("JOIN_GAME", (gameId, callback) => {
+      let game = gamesController.get(gameId);
+      if (!game) return;
+      game = gamesController.addPlayer(game?.id, player);
+      if (!game) return;
 
-      consola.info(`A player wants to join the game ${roomId}`);
-      socket.join(roomId);
-      socket.to(roomId).emit("ROOM_UPDATED", { room });
-      callback({ room });
+      consola.info(`A player wants to join the game ${gameId}`);
+      socket.join(gameId);
+      socket.to(gameId).emit("GAME_UPDATED", { game: game });
+      callback({ game });
     });
 
     socket.on(
-      "CREATE_ROOM",
+      "CREATE_GAME",
       (data?: { roomId: string }, callback?: CallableFunction) => {
-        const room = roomsController.create();
+        const room = gamesController.create();
         consola.info(`Creating the room ${room.id}`);
         callback?.({ status: "SUCCESS", data: { room } });
       }

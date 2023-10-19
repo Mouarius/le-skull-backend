@@ -8,7 +8,7 @@ export type Player = User & {
   color?: "" | "red" | "orange" | "yellow";
 };
 
-export type Room = {
+export type Game = {
   id: string;
   status: "UNINITIALIZED" | "INITIALIZED" | "LOBBY" | "IN_GAME";
   players: Player[];
